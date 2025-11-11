@@ -73,11 +73,14 @@ export default function DashboardPage() {
   const [resourceError, setResourceError] = useState<string | null>(null);
 
   const [planChangeLoading, setPlanChangeLoading] = useState<string | null>(null);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | undefined>();
+  const [templateApplyLoading, setTemplateApplyLoading] = useState<string | null>(null);
   const [cardForm, setCardForm] = useState<CardFormState>(defaultCardForm);
   const [cardSubmitting, setCardSubmitting] = useState(false);
   const [cardSuccess, setCardSuccess] = useState<string | null>(null);
   const [cardSuccessAlias, setCardSuccessAlias] = useState<string | null>(null);
   const [origin, setOrigin] = useState('');
+  const [templateSuccess, setTemplateSuccess] = useState<string | null>(null);
 
   const fullName = useMemo(() => {
     if (!user) return '';
@@ -86,6 +89,12 @@ export default function DashboardPage() {
     }
     return user?.email ?? '';
   }, [user]);
+
+  useEffect(() => {
+    if (cardForm.templateId && selectedTemplateId !== cardForm.templateId) {
+      setSelectedTemplateId(cardForm.templateId);
+    }
+  }, [cardForm.templateId, selectedTemplateId]);
 
   const roleLabel = useMemo(() => {
     if (!user) return '';
@@ -137,6 +146,14 @@ export default function DashboardPage() {
       setPlans(plansRes.data);
       setTemplates(templatesRes.data);
       setCards(cardsRes.data);
+      setSelectedTemplateId((prev) => {
+        if (prev) {
+          return prev;
+        }
+        const firstCardTemplate = cardsRes.data.find((card) => card.template?.id)
+          ?.template?.id;
+        return firstCardTemplate ?? prev;
+      });
     } catch (error) {
       console.error('Failed to load workspace data', error);
       setResourceError('Unable to load your workspace. Please try again later.');
@@ -193,6 +210,12 @@ export default function DashboardPage() {
     }
   };
 
+  const handleTemplateSelect = (templateId: number) => {
+    setSelectedTemplateId(templateId);
+    handleCardFormChange('templateId', templateId);
+    setTemplateSuccess(null);
+  };
+
   const handleCardFormChange = (field: keyof CardFormState, value: string | number) => {
     setCardForm((prev) => ({
       ...prev,
@@ -200,11 +223,48 @@ export default function DashboardPage() {
     }));
   };
 
+  const handleApplyTemplateToCard = async (cardId: string) => {
+    if (!selectedTemplateId) {
+      setResourceError('Select a template from the gallery before applying it.');
+      return;
+    }
+
+    setTemplateApplyLoading(cardId);
+    setResourceError(null);
+    setTemplateSuccess(null);
+
+    try {
+      await api.patch(`/vcards/${cardId}`, {
+        templateId: selectedTemplateId,
+      });
+      await loadWorkspaceData();
+      const appliedTemplate = templates.find((tpl) => tpl.id === selectedTemplateId);
+      setTemplateSuccess(
+        `Template ${appliedTemplate ? `"${appliedTemplate.name}"` : ''} applied successfully.`,
+      );
+    } catch (error) {
+      console.error('Failed to update card template', error);
+      setResourceError('Unable to apply template to the selected card. Please try again.');
+    } finally {
+      setTemplateApplyLoading(null);
+    }
+  };
+
+  const buildPublicLink = (alias: string) => {
+    let base =
+      origin || (typeof window !== 'undefined' ? window.location.origin : '');
+    if (!base) {
+      base = 'http://localhost:3001';
+    }
+    if (!base.startsWith('http')) {
+      base = `http://${base}`;
+    }
+    const normalizedBase = base.replace(/\/$/, '');
+    return `${normalizedBase}/cards/${alias}`;
+  };
+
   const handleCopyLink = async (alias: string) => {
-    if (!origin) return;
-    const scheme = origin.startsWith('http') ? '' : 'http://';
-    const base = origin.replace(/\/$/, '');
-    const link = `${scheme}${base}/cards/${alias}`;
+    const link = buildPublicLink(alias);
     try {
       await navigator.clipboard.writeText(link);
       setCardSuccess(`Link copied: ${link}`);
@@ -526,6 +586,17 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {templateSuccess && (
+          <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
+            {templateSuccess}
+          </div>
+        )}
+        {!selectedTemplateId && templates.length > 0 && (
+          <p className="text-xs text-slate-400">
+            Select a template below to use it for new cards or apply it to an existing one.
+          </p>
+        )}
+
         {templates.length === 0 ? (
           <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
             No templates available for your current plan yet. Upgrade your subscription
@@ -537,9 +608,9 @@ export default function DashboardPage() {
               <button
                 key={template.id}
                 type="button"
-                onClick={() => handleCardFormChange('templateId', template.id)}
+                onClick={() => handleTemplateSelect(template.id)}
                 className={`flex flex-col overflow-hidden rounded-xl border text-left transition hover:shadow ${
-                  cardForm.templateId === template.id
+                  selectedTemplateId === template.id
                     ? 'border-indigo-500 shadow-lg'
                     : 'border-slate-200'
                 }`}
@@ -811,7 +882,16 @@ export default function DashboardPage() {
                     Template: {card.template.name}
                   </p>
                 ) : null}
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="primary"
+                    className="px-3 py-1 text-xs"
+                    disabled={!selectedTemplateId || !!templateApplyLoading}
+                    isLoading={templateApplyLoading === card.id}
+                    onClick={() => void handleApplyTemplateToCard(card.id)}
+                  >
+                    Apply template
+                  </Button>
                   <Link href={`/cards/${card.urlAlias}`} target="_blank">
                     <Button variant="secondary" className="px-3 py-1 text-xs">
                       <ExternalLink className="mr-2 h-3 w-3" />
