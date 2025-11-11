@@ -10,6 +10,7 @@ import {
   fallbackTemplateGallery,
 } from '@/data/marketing';
 import { Button } from '@/components/ui/button';
+import { Navigation } from '@/components/layout/navigation';
 
 export const revalidate = 60;
 
@@ -62,36 +63,7 @@ export default async function MarketingPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
-          <span className="text-lg font-semibold text-slate-900">
-            IVGK Digital Cards
-          </span>
-          <nav className="flex items-center gap-4 text-sm text-slate-600">
-            <Link href="#features" className="hover:text-slate-900">
-              Features
-            </Link>
-            <Link href="#plans" className="hover:text-slate-900">
-              Plans
-            </Link>
-            <Link href="#templates" className="hover:text-slate-900">
-              Templates
-            </Link>
-            <div className="ml-4 flex items-center gap-3">
-              <Link href="/register">
-                <Button variant="primary" className="flex items-center">
-                  Get started
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/login" className="text-slate-500 hover:text-slate-900">
-                Login
-              </Link>
-            </div>
-          </nav>
-        </div>
-      </header>
-
+      <Navigation mode="marketing" />
       <main className="flex-1">
         <section className="bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-700 text-white">
           <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-20 md:grid-cols-2">

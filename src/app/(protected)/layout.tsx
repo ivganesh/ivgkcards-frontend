@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { Navigation } from '@/components/layout/navigation';
 import { authStorage } from '@/lib/auth-storage';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -47,7 +48,8 @@ export default function ProtectedLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-100">
+      <Navigation mode="dashboard" />
       <div className="mx-auto w-full max-w-6xl px-4 py-8">{children}</div>
     </div>
   );
