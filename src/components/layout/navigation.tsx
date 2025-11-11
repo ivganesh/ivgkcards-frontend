@@ -103,16 +103,28 @@ export function Navigation({ mode }: NavigationProps) {
           Overview
         </Link>
         {isSuperAdmin ? (
-          <Link
-            href="/dashboard/super-admin/plans"
-            className={`transition hover:text-slate-900 ${
-              pathname?.startsWith('/dashboard/super-admin/plans')
-                ? 'text-slate-900 font-semibold'
-                : ''
-            }`}
-          >
-            Plans
-          </Link>
+          <>
+            <Link
+              href="/dashboard/super-admin/users"
+              className={`transition hover:text-slate-900 ${
+                pathname?.startsWith('/dashboard/super-admin/users')
+                  ? 'text-slate-900 font-semibold'
+                  : ''
+              }`}
+            >
+              Users
+            </Link>
+            <Link
+              href="/dashboard/super-admin/plans"
+              className={`transition hover:text-slate-900 ${
+                pathname?.startsWith('/dashboard/super-admin/plans')
+                  ? 'text-slate-900 font-semibold'
+                  : ''
+              }`}
+            >
+              Plans
+            </Link>
+          </>
         ) : null}
       </div>
     ) : null;

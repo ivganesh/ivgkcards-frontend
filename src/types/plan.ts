@@ -19,7 +19,7 @@ export interface PlanTemplateAccess {
 export interface PlanSummary {
   id: string;
   name: string;
-  price: number;
+  price: number | string;
   currencyId: string;
   frequency: PlanFrequency;
   noOfVcards: number;
