@@ -119,7 +119,10 @@ export function PlanForm({
     if (mode === 'edit' && initialValues) {
       reset({
         name: initialValues.name,
-        price: initialValues.price,
+        price:
+          typeof initialValues.price === 'number'
+            ? initialValues.price
+            : Number(initialValues.price ?? 0),
         currencyId: initialValues.currencyId,
         frequency: initialValues.frequency,
         noOfVcards: initialValues.noOfVcards,
