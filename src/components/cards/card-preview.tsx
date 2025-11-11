@@ -40,9 +40,14 @@ export function CardPreviewFrame({ html, css, js, data }: CardPreviewProps) {
   return (
     <iframe
       title="Digital Card Preview"
-      className="h-[70vh] w-full rounded-xl border border-slate-200 bg-white shadow"
       srcDoc={documentString}
       sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
+      style={{
+        width: '100%',
+        minHeight: '100vh',
+        border: 'none',
+        backgroundColor: '#fff',
+      }}
     />
   );
 }

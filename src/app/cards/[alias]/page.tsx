@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
@@ -89,29 +90,37 @@ export default async function CardPage({ params }: CardPageProps) {
   const { vcard, template, assets, data } = rendered;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-6 px-4 py-10">
-      <header className="text-center">
-        <h1 className="text-2xl font-semibold text-slate-900">
-          {vcard.name}
-        </h1>
-        <p className="text-sm text-slate-500">
-          Powered by IVGK Digital Cards{template ? ` • ${template.name}` : ''}
-        </p>
-      </header>
-
-      {assets ? (
-        <CardPreviewFrame
-          html={assets.html}
-          css={assets.css}
-          js={assets.js}
-          data={data}
-        />
-      ) : (
-        <div className="rounded-xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-600 shadow-sm">
-          This card does not have an associated template yet. Reach out to the
-          owner to assign one in the dashboard.
+    <main className="flex min-h-screen flex-col bg-slate-900">
+      <div className="flex items-center justify-between px-4 py-3 text-sm text-slate-100">
+        <div>
+          <p className="font-semibold text-slate-50">{vcard.name}</p>
+          <p className="text-xs text-slate-300">
+            Powered by IVGK Digital Cards{template ? ` • ${template.name}` : ''}
+          </p>
         </div>
-      )}
+        <Link
+          href="/"
+          className="rounded-md border border-slate-700 px-3 py-1 text-xs text-slate-300 transition hover:bg-slate-800"
+        >
+          Back to marketing
+        </Link>
+      </div>
+
+      <div className="flex-1 bg-white">
+        {assets ? (
+          <CardPreviewFrame
+            html={assets.html}
+            css={assets.css}
+            js={assets.js}
+            data={data}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-600">
+            This card does not have an associated template yet. Reach out to the owner
+            to assign one in the dashboard.
+          </div>
+        )}
+      </div>
     </main>
   );
 }
