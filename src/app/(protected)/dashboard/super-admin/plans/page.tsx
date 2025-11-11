@@ -182,12 +182,22 @@ export default function SuperAdminPlansPage() {
   };
 
   const enrichedPlans = useMemo(() => {
-    return plans.map((plan) => ({
-      ...plan,
-      currencyLabel: plan.currency
-        ? `${plan.currency.code} ${plan.currency.symbol ?? ''}`.trim()
-        : '—',
-    }));
+    return plans.map((plan) => {
+      const numericPrice =
+        typeof plan.price === 'number'
+          ? plan.price
+          : plan.price
+            ? Number(plan.price)
+            : 0;
+
+      return {
+        ...plan,
+        price: numericPrice,
+        currencyLabel: plan.currency
+          ? `${plan.currency.code} ${plan.currency.symbol ?? ''}`.trim()
+          : '—',
+      };
+    });
   }, [plans]);
 
   if (authLoading) {
