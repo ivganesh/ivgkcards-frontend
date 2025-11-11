@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
@@ -88,6 +89,10 @@ export default async function CardPage({ params }: CardPageProps) {
   }
 
   const { vcard, template, assets, data } = rendered;
+  const headersList = await headers();
+  const host = headersList.get('host') ?? 'localhost:3001';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const publicUrl = `${protocol}://${host}/cards/${alias}`;
 
   return (
     <main className="flex min-h-screen flex-col bg-slate-900">
@@ -113,6 +118,10 @@ export default async function CardPage({ params }: CardPageProps) {
             css={assets.css}
             js={assets.js}
             data={data}
+            meta={{
+              publicUrl,
+              alias,
+            }}
           />
         ) : (
           <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-600">

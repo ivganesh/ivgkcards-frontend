@@ -202,7 +202,9 @@ export default function DashboardPage() {
 
   const handleCopyLink = async (alias: string) => {
     if (!origin) return;
-    const link = `${origin}/cards/${alias}`;
+    const scheme = origin.startsWith('http') ? '' : 'http://';
+    const base = origin.replace(/\/$/, '');
+    const link = `${scheme}${base}/cards/${alias}`;
     try {
       await navigator.clipboard.writeText(link);
       setCardSuccess(`Link copied: ${link}`);
