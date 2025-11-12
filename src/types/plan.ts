@@ -61,5 +61,18 @@ export interface PlanFormValues {
   templateIds?: number[];
 }
 
+export type PlanFeatureCategory = 'section' | 'engagement' | 'capability';
+
+export interface PlanFeatureDefinition {
+  key: string;
+  label: string;
+  description: string;
+  category: PlanFeatureCategory;
+  supportsLimit?: boolean;
+  limitLabel?: string;
+  defaultLimit?: number;
+  sectionKey?: string;
+}
+
 export type PlanUserRole = Extract<UserRole, 'SUPER_ADMIN' | 'ADMIN' | 'USER'>;
 

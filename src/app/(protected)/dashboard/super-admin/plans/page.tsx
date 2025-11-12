@@ -15,7 +15,11 @@ import { Button } from '@/components/ui/button';
 import { PlanForm } from '@/components/plans/plan-form';
 import { useAuth } from '@/hooks/use-auth';
 import { api } from '@/lib/api-client';
-import type { PlanFormValues, PlanSummary } from '@/types/plan';
+import type {
+  PlanFeatureDefinition,
+  PlanFormValues,
+  PlanSummary,
+} from '@/types/plan';
 
 interface TemplateSummary {
   id: number;
@@ -39,6 +43,7 @@ export default function SuperAdminPlansPage() {
   const [plans, setPlans] = useState<PlanSummary[]>([]);
   const [templates, setTemplates] = useState<TemplateSummary[]>([]);
   const [currencies, setCurrencies] = useState<CurrencySummary[]>([]);
+  const [featureCatalog, setFeatureCatalog] = useState<PlanFeatureDefinition[]>([]);
   const [loadState, setLoadState] = useState<LoadState>('idle');
   const [error, setError] = useState<string | null>(null);
 
@@ -76,25 +81,33 @@ export default function SuperAdminPlansPage() {
     return response.data;
   }, []);
 
+  const fetchFeatureCatalog = useCallback(async () => {
+    const response = await api.get<PlanFeatureDefinition[]>('/plans/features');
+    return response.data;
+  }, []);
+
   const loadAllData = useCallback(async () => {
     setLoadState('loading');
     setError(null);
     try {
-      const [plansData, templatesData, currenciesData] = await Promise.all([
-        fetchPlans(),
-        fetchTemplates(),
-        fetchCurrencies(),
-      ]);
+      const [plansData, templatesData, currenciesData, featureCatalogData] =
+        await Promise.all([
+          fetchPlans(),
+          fetchTemplates(),
+          fetchCurrencies(),
+          fetchFeatureCatalog(),
+        ]);
       setPlans(plansData);
       setTemplates(templatesData);
       setCurrencies(currenciesData);
+      setFeatureCatalog(featureCatalogData);
       setLoadState('idle');
     } catch (err) {
       console.error('Failed to load plan management data', err);
       setError('Unable to load plans. Please try again or check the API status.');
       setLoadState('error');
     }
-  }, [fetchPlans, fetchTemplates, fetchCurrencies]);
+  }, [fetchPlans, fetchTemplates, fetchCurrencies, fetchFeatureCatalog]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -265,6 +278,7 @@ export default function SuperAdminPlansPage() {
           isSubmitting={isSubmitting}
           availableTemplates={templates}
           currencies={currencies}
+          featureCatalog={featureCatalog}
         />
       ) : null}
 

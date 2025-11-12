@@ -2,11 +2,13 @@
 
 import { useMemo } from 'react';
 
+import type { RenderedCardData } from '@/types/vcard';
+
 interface CardPreviewProps {
   html: string;
   css?: string | null;
   js?: string | null;
-  data: unknown;
+  data: RenderedCardData;
   meta?: Record<string, unknown>;
 }
 

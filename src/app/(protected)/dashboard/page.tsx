@@ -13,7 +13,8 @@ import type { PlanSummary } from '@/types/plan';
 import type { SubscriptionSummary } from '@/types/subscription';
 import type { TemplateSummary } from '@/types/template';
 import type { UserStatsResponse } from '@/types/user';
-import type { VcardSummary } from '@/types/vcard';
+import type { VcardDetail, VcardSummary } from '@/types/vcard';
+import { CardEditor } from '@/components/cards/card-editor';
 
 interface CardFormState {
   urlAlias: string;
@@ -81,6 +82,10 @@ export default function DashboardPage() {
   const [cardSuccessAlias, setCardSuccessAlias] = useState<string | null>(null);
   const [origin, setOrigin] = useState('');
   const [templateSuccess, setTemplateSuccess] = useState<string | null>(null);
+  const [editorCard, setEditorCard] = useState<VcardDetail | null>(null);
+  const [editorCardId, setEditorCardId] = useState<string | null>(null);
+  const [editorLoading, setEditorLoading] = useState(false);
+  const [editorError, setEditorError] = useState<string | null>(null);
 
   const fullName = useMemo(() => {
     if (!user) return '';
@@ -161,6 +166,32 @@ export default function DashboardPage() {
       setResourceLoading(false);
     }
   }, [user]);
+
+  const openCardEditor = useCallback(
+    async (cardId: string) => {
+      setEditorCardId(cardId);
+      setEditorLoading(true);
+      setEditorError(null);
+      try {
+        const response = await api.get<VcardDetail>(`/vcards/${cardId}`);
+        setEditorCard(response.data);
+      } catch (error) {
+        console.error('Failed to load card editor', error);
+        setEditorError('Unable to load card details. Please try again.');
+        setEditorCard(null);
+      } finally {
+        setEditorLoading(false);
+      }
+    },
+    [],
+  );
+
+  const closeEditor = useCallback(() => {
+    setEditorCard(null);
+    setEditorCardId(null);
+    setEditorError(null);
+    setEditorLoading(false);
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -892,6 +923,13 @@ export default function DashboardPage() {
                   >
                     Apply template
                   </Button>
+                  <Button
+                    variant="secondary"
+                    className="px-3 py-1 text-xs"
+                    onClick={() => void openCardEditor(card.id)}
+                  >
+                    Manage content
+                  </Button>
                   <Link href={`/cards/${card.urlAlias}`} target="_blank">
                     <Button variant="secondary" className="px-3 py-1 text-xs">
                       <ExternalLink className="mr-2 h-3 w-3" />
@@ -931,6 +969,39 @@ export default function DashboardPage() {
           </li>
         </ul>
       </section>
+
+      {editorLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60">
+          <div className="rounded-lg bg-white px-4 py-3 text-sm text-slate-700 shadow-lg">
+            Loading card editor…
+          </div>
+        </div>
+      )}
+
+      {editorError && !editorLoading && !editorCard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60">
+          <div className="space-y-3 rounded-lg bg-white px-5 py-4 text-sm text-slate-700 shadow-xl">
+            <p>{editorError}</p>
+            <div className="flex justify-end">
+              <Button onClick={() => setEditorError(null)}>Close</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editorCard && (
+        <CardEditor
+          card={editorCard}
+          onClose={() => {
+            closeEditor();
+            void loadWorkspaceData();
+          }}
+          onUpdated={(updatedCard) => {
+            setEditorCard(updatedCard);
+            void loadWorkspaceData();
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 
 import { CardPreviewFrame } from '@/components/cards/card-preview';
 import { env } from '@/config/env';
+import type { RenderedCardData } from '@/types/vcard';
 
 interface CardPageProps {
   params: {
@@ -48,7 +49,7 @@ async function fetchRenderedCard(alias: string) {
         preview?: string | null;
       };
     } | null;
-    data: unknown;
+    data: RenderedCardData;
   };
 }
 

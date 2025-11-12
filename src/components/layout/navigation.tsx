@@ -124,6 +124,16 @@ export function Navigation({ mode }: NavigationProps) {
             >
               Plans
             </Link>
+            <Link
+              href="/dashboard/super-admin/currencies"
+              className={`transition hover:text-slate-900 ${
+                pathname?.startsWith('/dashboard/super-admin/currencies')
+                  ? 'text-slate-900 font-semibold'
+                  : ''
+              }`}
+            >
+              Currencies
+            </Link>
           </>
         ) : null}
       </div>
