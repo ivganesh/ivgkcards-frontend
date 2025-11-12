@@ -315,13 +315,21 @@ const normalizeSectionsState = (
   return normalized as VcardSections;
 };
 
-const filterEmpty = <T extends { title?: string; name?: string; label?: string; platform?: string; url?: string }>(
+const filterEmpty = <
+  T extends {
+    title?: string | null;
+    name?: string | null;
+    label?: string | null;
+    platform?: string | null;
+    url?: string | null;
+  },
+>(
   items: T[],
   key: 'title' | 'name' | 'label' | 'platform' | 'url',
 ) =>
   items.filter((item) => {
-    const candidate = (item as Record<string, string | undefined>)[key];
-    return candidate && candidate.toString().trim().length > 0;
+    const candidate = item?.[key];
+    return typeof candidate === 'string' && candidate.trim().length > 0;
   });
 
 export function CardEditor({ card, onClose, onUpdated }: CardEditorProps) {
@@ -792,9 +800,15 @@ export function CardEditor({ card, onClose, onUpdated }: CardEditorProps) {
   };
 
   const sanitizeGalleriesPayload = () =>
-    filterEmpty(galleries, 'imageUrl').map((gallery, index) => ({
+    filterEmpty(
+      galleries.map((gallery) => ({
+        ...gallery,
+        url: gallery.imageUrl ?? '',
+      })),
+      'url',
+    ).map((gallery, index) => ({
       title: sanitizeString(gallery.title ?? ''),
-      imageUrl: gallery.imageUrl.trim(),
+      imageUrl: (gallery.imageUrl ?? '').trim(),
       order: gallery.order ?? index,
     }));
 
@@ -1628,7 +1642,7 @@ export function CardEditor({ card, onClose, onUpdated }: CardEditorProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={addService}>
+                <Button variant="secondary" onClick={addService}>
                   Add service
                 </Button>
                 <Button onClick={handleSaveServices} disabled={servicesSaving}>
@@ -1766,7 +1780,7 @@ export function CardEditor({ card, onClose, onUpdated }: CardEditorProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={addProduct}>
+                <Button variant="secondary" onClick={addProduct}>
                   Add product
                 </Button>
                 <Button onClick={handleSaveProducts} disabled={productsSaving}>
@@ -1930,7 +1944,7 @@ export function CardEditor({ card, onClose, onUpdated }: CardEditorProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={addGalleryItem}>
+                <Button variant="secondary" onClick={addGalleryItem}>
                   Add image
                 </Button>
                 <Button onClick={handleSaveGalleries} disabled={galleriesSaving}>
@@ -2036,7 +2050,7 @@ export function CardEditor({ card, onClose, onUpdated }: CardEditorProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={addTestimonial}>
+                <Button variant="secondary" onClick={addTestimonial}>
                   Add testimonial
                 </Button>
                 <Button onClick={handleSaveTestimonials} disabled={testimonialsSaving}>
@@ -2255,7 +2269,7 @@ export function CardEditor({ card, onClose, onUpdated }: CardEditorProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={addAppointment}>
+                <Button variant="secondary" onClick={addAppointment}>
                   Add slot
                 </Button>
                 <Button onClick={handleSaveAppointments} disabled={appointmentsSaving}>
@@ -2379,7 +2393,7 @@ export function CardEditor({ card, onClose, onUpdated }: CardEditorProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={addSocialLink}>
+                <Button variant="secondary" onClick={addSocialLink}>
                   Add link
                 </Button>
                 <Button onClick={handleSaveSocial} disabled={socialSaving}>
@@ -2470,7 +2484,7 @@ export function CardEditor({ card, onClose, onUpdated }: CardEditorProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={addCustomLink}>
+                <Button variant="secondary" onClick={addCustomLink}>
                   Add link
                 </Button>
                 <Button onClick={handleSaveCustomLinks} disabled={customSaving}>

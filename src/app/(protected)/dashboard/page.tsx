@@ -83,7 +83,6 @@ export default function DashboardPage() {
   const [origin, setOrigin] = useState('');
   const [templateSuccess, setTemplateSuccess] = useState<string | null>(null);
   const [editorCard, setEditorCard] = useState<VcardDetail | null>(null);
-  const [editorCardId, setEditorCardId] = useState<string | null>(null);
   const [editorLoading, setEditorLoading] = useState(false);
   const [editorError, setEditorError] = useState<string | null>(null);
 
@@ -169,7 +168,6 @@ export default function DashboardPage() {
 
   const openCardEditor = useCallback(
     async (cardId: string) => {
-      setEditorCardId(cardId);
       setEditorLoading(true);
       setEditorError(null);
       try {
@@ -188,7 +186,6 @@ export default function DashboardPage() {
 
   const closeEditor = useCallback(() => {
     setEditorCard(null);
-    setEditorCardId(null);
     setEditorError(null);
     setEditorLoading(false);
   }, []);
