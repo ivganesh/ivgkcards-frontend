@@ -237,8 +237,7 @@ export default async function MarketingPage() {
       </main>
 
       <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
-        &copy; {new Date().getFullYear()} IVGK Digital Cards. Crafted from the
-        basedoc requirements – ready to extend.
+        &copy; {new Date().getFullYear()} IVGK Digital Cards. All rights reserved.
       </footer>
     </div>
   );

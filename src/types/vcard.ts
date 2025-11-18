@@ -224,4 +224,9 @@ export interface RenderedCardData {
     available: boolean;
   }>;
   sections: VcardSections | null;
+  qrCode?: {
+    url: string;
+    imageDataUrl: string;
+    downloadFileName: string;
+  };
 }
